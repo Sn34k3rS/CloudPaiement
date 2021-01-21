@@ -1,0 +1,41 @@
+.App {
+  text-align: center;
+  display: flex;
+  align-content: center;
+  flex-direction: column;
+
+}
+
+nav {
+  background-color: darkblue;
+  width: 100%;
+  height: 12vh;
+  font-size: xx-large;
+  color: white;
+  display: flex;
+  align-items: center;
+  padding-left: 250px;
+}
+
+.card-form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.card-container {
+  margin-top: 25px;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  width: 520px;
+  height: 100px;
+}
+.card-stripe {
+  padding: 20px;
+  width: 100%;
+  height: 100px;
+}
+
+
