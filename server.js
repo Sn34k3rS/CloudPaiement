@@ -2,30 +2,15 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require("body-parser");
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 const path = require('path');
 
 const key = require('./config/dev')
 const Stripe = require('stripe')(key.stripeSecret);
 
 // MiddleWares
-const whitelist = ['http://localhost:3000', 'http://localhost:5000', 'https://cloud-pay-card-payment.herokuapp.com/']
-const corsOptions = {
-    origin: (origin, callback) => {
-        console.log(`**Origin of request ${origin}`)
-        if (whitelist.indexOf(origin) !== -1 || !origin) {
-            console.log("Origin acceptable")
-            callback(null, true)
-        } else {
-            console.log("Origin rejected")
-            callback(new Error('Not allowed by CORS'))
-        }
-    }
-}
-app.use(cors(corsOptions));
+app.use(cors());
 app.use(bodyParser());
-
-
 
 // Production Part
 if (process.env.NODE_ENV === 'production') {
