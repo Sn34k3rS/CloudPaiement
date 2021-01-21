@@ -9,7 +9,7 @@ const key = require('./config/dev')
 const Stripe = require('stripe')(key.stripeSecret);
 
 // MiddleWares
-const whitelist = ['http://localhost:3000', 'http://localhost:5000', 'https://shrouded-journey-38552.herokuapp.com']
+const whitelist = ['http://localhost:3000', 'http://localhost:5000', 'https://cloud-pay-card-payment.herokuapp.com/']
 const corsOptions = {
     origin: (origin, callback) => {
         console.log(`**Origin of request ${origin}`)
