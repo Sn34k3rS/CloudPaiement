@@ -50,6 +50,10 @@ const Payment = () => {
         e.preventDefault();
         setIsProcessing(true);
 
+        // Data Vérification
+        // Name
+        if (!isNaN(name)) return console.log("Vous ne pouvez pas avoir de lettre dans votre nom")
+        // Email
         const cardElement = element.getElement("card");
 
         const billingInfo = {
