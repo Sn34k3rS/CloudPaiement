@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import {CardElement, useStripe, useElements} from '@stripe/react-stripe-js'
 import axios from 'axios';
 import { useHistory } from 'react-router-dom';
+const email_checker = require("email-verifier-node");
 
 const Payment = () => {
 
@@ -49,11 +50,17 @@ const Payment = () => {
     const paymentIntent = async (e) => {
         e.preventDefault();
         setIsProcessing(true);
-
+/*
         // Data Vérification
         // Name
-        if (!isNaN(name)) return console.log("Vous ne pouvez pas avoir de lettre dans votre nom")
+        let typeName = typeof name;
+        console.log(typeName);
+        if (typeName !== "string") return console.log("Vous ne pouvez pas avoir de lettre dans votre nom")
         // Email
+        const checkedEmail = await email_checker.verify_email(`${email}`);
+        console.log(checkedEmail);*/
+
+
         const cardElement = element.getElement("card");
 
         const billingInfo = {
