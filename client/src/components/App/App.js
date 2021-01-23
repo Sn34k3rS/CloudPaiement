@@ -11,7 +11,10 @@ import Error from "../EndPayment/Error";
 // Stripe
 import {Elements} from "@stripe/react-stripe-js";
 import {loadStripe} from "@stripe/stripe-js";
-const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PK_KEY);
+
+const key = require('../../config/dev.js');
+const stripePromise = loadStripe(key.publishableKey);
+console.log(key.publishableKey);
 
 const App = () =>{
     return (
