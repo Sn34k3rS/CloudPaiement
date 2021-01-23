@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import {CardElement, useStripe, useElements} from '@stripe/react-stripe-js'
 import axios from 'axios';
 import { useHistory } from 'react-router-dom';
-const email_checker = require("email-verifier-node");
+const validatePhoneNumber = require('validate-phone-number-node-js');
 
 const Payment = () => {
 
@@ -12,7 +12,6 @@ const Payment = () => {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [phone, setPhone] = useState(0);
-    const [address, setAddress] = useState("")
     const [isProcessing, setIsProcessing] = useState(false);
     const [checkoutError, setCheckoutError] = useState("");
     const stripe = useStripe();
@@ -33,13 +32,9 @@ const Payment = () => {
     const phoneHandler = (e) => {
         setPhone(e.target.value);
     };
-    const addressHandler = (e) => {
-        setAddress(e.target.value);
-    };
     const cardHandler = (e) => {
 
         if (e.error) {
-            console.log(e.error.message)
             setCheckoutError(e.error.message);
         } else {
             setCheckoutError("");
@@ -50,16 +45,48 @@ const Payment = () => {
     const paymentIntent = async (e) => {
         e.preventDefault();
         setIsProcessing(true);
-/*
-        // Data Vérification
-        // Name
-        let typeName = typeof name;
-        console.log(typeName);
-        if (typeName !== "string") return console.log("Vous ne pouvez pas avoir de lettre dans votre nom")
-        // Email
-        const checkedEmail = await email_checker.verify_email(`${email}`);
-        console.log(checkedEmail);*/
 
+        // Data Vérification
+
+        // PaiementMethod
+        if (paymentMethod === "") {
+           setCheckoutError("Veuillez indiquer une plateforme de destination pour votre échange")
+            setIsProcessing(false);
+           return
+        } else {
+            setCheckoutError('');
+        }
+
+        // Amount
+        let checkAmount = false;
+        if (!isNaN(amount)) {
+            if (amount.length >= 4) {
+                checkAmount = true;
+            }
+        }
+        if (!checkAmount) {
+            setCheckoutError("Veuillez mettre un montant valide (un nombre avec 4 chiffres)");
+            setIsProcessing(false);
+            return
+        } else {
+            setCheckoutError('')
+        }
+
+        // Phone
+        let checkPhone = false;
+        const result = await validatePhoneNumber.validate(phone);
+        if (result) {
+            if (phone.length === 10) {
+                checkPhone = true;
+            }
+        }
+        if (!checkPhone) {
+            setCheckoutError("Veuillez mettre un numéro de téléphone valide");
+            setIsProcessing(false);
+            return
+        } else {
+            setCheckoutError('')
+        }
 
         const cardElement = element.getElement("card");
 
@@ -67,9 +94,6 @@ const Payment = () => {
             name: name,
             phone: phone,
             email: email,
-            address: {
-                line1: address,
-            },
         };
         let data = {
             amount: amount,
@@ -88,7 +112,7 @@ const Payment = () => {
                 setCheckoutError(paymentMethodObj.error.message);
                 setIsProcessing(false);
                 return
-            };
+            }
             const confirmPayment = await stripe.confirmCardPayment(paymentIntent.data, {
                 payment_method: paymentMethodObj.paymentMethod.id,
             });
@@ -96,7 +120,7 @@ const Payment = () => {
                 setCheckoutError(confirmPayment.error.message);
                 setIsProcessing(false);
                 return
-            };
+            }
 
             if (confirmPayment) {
                 history.push('/pay/success')
@@ -108,28 +132,36 @@ const Payment = () => {
     };
 
     return(
-        <div>
-            <h1>Information sur votre transaction</h1>
-            <h3>Choix de la transaction</h3>
+        <div className="CheckoutForm">
+            <h3 className="purchase-msg">Choix de la transaction</h3>
 
-            <form onSubmit={paymentIntent}>
-                <div>
-                    <label htmlFor="name">Nom: </label>
-                    <input id="name" type="text" name="name" onChange={nameHandler} required/>
-                </div>
-                <div>
-                    <label htmlFor="email">Email: </label>
-                    <input id="email" type="email" name="email" onChange={emailHandler} required/>
-                </div>
-                <div>
-                    <label htmlFor="phone">Téléphone: </label>
-                    <input id="phone" type="number" name="phone" onChange={phoneHandler} required/>
-                </div>
-                <div>
-                    <label htmlFor="address">Adresse: </label>
-                    <input id="address" type="text" name="address" onChange={addressHandler} required/>
-                </div>
-                <select onChange={selectHandler} name={"PaymentMethod"}>
+            <form onSubmit={paymentIntent} className="form">
+                <input
+                    type="text"
+                    placeholder="Nom"
+                    name="name"
+                    onChange={nameHandler}
+                    required
+                />
+                <input
+                    type="email"
+                    placeholder="E-mail"
+                    name="email"
+                    onChange={emailHandler}
+                    required
+                />
+                <input
+                    type="number"
+                    placeholder="n° Téléphone"
+                    name="phone"
+                    onChange={phoneHandler}
+                    required
+                />
+                <select
+                    onChange={selectHandler}
+                    name={"PaymentMethod"}
+                    placeholder="Destination"
+                >
                     <option value="">...</option>
                     <option value="paypal">Vers PayPal</option>
                     <option value="bitcoin">Vers Bitcoin</option>
@@ -138,12 +170,16 @@ const Payment = () => {
                 <p>
                     Dans la partie suivante, veuillez préciser le montant que vous souhaitez convertir.
                     Ecrivez la somme tout attaché (ex: 20€ -> 2000, 0.99€ -> 0099).
-                    Les taxes qui sont appliquées sont sur notre <a href={"/#"}>Discord</a>
+                    Les taxes qui sont appliquées sont sur notre <a href={"https://discord.gg/BS2a4zuG"} target={"_blank"}>Discord</a>
                 </p>
-                <div>
-                    <label htmlFor="amount">Montant: </label>
-                    <input id="amount" type="number" name="amount" min="10" onChange={amountHandler} required/>
-                </div>
+                <input
+                    type="number"
+                    name="amount"
+                    placeholder="Montant"
+                    min="10"
+                    onChange={amountHandler}
+                    required
+                />
                 <h6>{checkoutError}</h6>
                 <CardElement
                     options={{
@@ -156,7 +192,7 @@ const Payment = () => {
                     }}
                     onChange={cardHandler}
                 />
-                <button type="submit" disabled={isProcessing}>{isProcessing ? "Paiment ..." : "Payer"}</button>
+                <button type="submit" disabled={isProcessing}>{isProcessing ? "Paiement ..." : "Payer"}</button>
             </form>
         </div>
     )

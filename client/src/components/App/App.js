@@ -14,7 +14,6 @@ import {loadStripe} from "@stripe/stripe-js";
 
 const key = require('../../config/dev.js');
 const stripePromise = loadStripe(key.publishableKey);
-console.log(key.publishableKey);
 
 const App = () =>{
     return (

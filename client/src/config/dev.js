@@ -3,7 +3,6 @@ let secret_public_key = 'pk_test_51IAJbuE18ded10SPLxYKbB4RbU6nHUlt3arR32wmMvLNl1
 
 if (process.env.NODE_ENV === 'production') {
     secret_public_key = process.env.REACT_APP_SECRET_KEY
-    console.log(secret_public_key)
 }
 
 module.exports = {
